@@ -3,9 +3,78 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bonfire: Fast Meta-Search for Games, Software & Android</title>
+  <meta name="description" content="A clean, dark mode meta-search engine querying curated Google Programmable Search Engines across verified sources. Zero ads, zero tracking, tactical keyboard flow.">
+  <meta name="keywords" content="meta search engine, game search, software repacks, steam rip, android apk search, clean search engine, programmable search">
+  <meta name="author" content="Parth Sadaria">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <meta name="theme-color" content="#0a0a10" id="tcolor">
-  <title>Bonfire: meta-search</title>
-  
+
+  <!-- Open Graph / Facebook / Discord -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Bonfire">
+  <meta property="og:title" content="Bonfire: Fast Meta-Search for Games, Software & Android">
+  <meta property="og:description" content="A clean, dark mode meta-search engine querying curated Google Programmable Search Engines across verified sources. Zero ads, zero tracking.">
+  <meta property="og:image" content="./assets/home.png">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@Parthsadaria">
+  <meta name="twitter:creator" content="@Parthsadaria">
+  <meta name="twitter:title" content="Bonfire: Fast Meta-Search for Games, Software & Android">
+  <meta name="twitter:description" content="A clean, dark mode meta-search engine querying curated Google Programmable Search Engines across verified sources. Zero ads, zero tracking.">
+  <meta name="twitter:image" content="./assets/home.png">
+
+  <!-- Mobile Web App & Favicon -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+  <link rel="apple-touch-icon" href="./assets/home.png">
+
+  <!-- Structured Data: Google Sitelinks Searchbox & WebApplication Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://parthsadaria.github.io/Bonfire/#website",
+        "url": "https://parthsadaria.github.io/Bonfire/",
+        "name": "Bonfire",
+        "description": "Fast meta-search engine for curated games, software, and Android apps.",
+        "author": {
+          "@type": "Person",
+          "name": "Parth Sadaria",
+          "url": "https://github.com/Parthsadaria"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://parthsadaria.github.io/Bonfire/?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://parthsadaria.github.io/Bonfire/#webapp",
+        "name": "Bonfire Meta-Search",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "All",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    ]
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif&display=swap" rel="stylesheet">

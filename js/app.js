@@ -490,6 +490,7 @@ $("#home").addEventListener("click", e => {
   const u = new URL(window.location);
   u.searchParams.delete("q");
   history.pushState({}, "", u.pathname + (u.searchParams.toString() ? "?" + u.searchParams.toString() : ""));
+  updateSeoMetadata("");
   renderHomeHub();
 });
 
@@ -580,11 +581,38 @@ const row = (r, i, q) => {
   </div></li>`;
 };
 
+function updateSeoMetadata(query = "") {
+  const defaultTitle = "Bonfire: Fast Meta-Search for Games, Software & Android";
+  const defaultDesc = "A clean, dark mode meta-search engine querying curated Google Programmable Search Engines across verified sources. Zero ads, zero tracking, tactical keyboard flow.";
+  
+  const title = query ? `${query} — Bonfire Search` : defaultTitle;
+  const desc = query 
+    ? `Search results for "${query}" across curated ${cat} sources on Bonfire. Ad-free, tracking-free meta search.` 
+    : defaultDesc;
+  
+  document.title = title;
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.content = desc;
+  
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  if (ogTitle) ogTitle.content = title;
+  
+  const ogDesc = document.querySelector('meta[property="og:description"]');
+  if (ogDesc) ogDesc.content = desc;
+
+  const twTitle = document.querySelector('meta[name="twitter:title"]');
+  if (twTitle) twTitle.content = title;
+  
+  const twDesc = document.querySelector('meta[name="twitter:description"]');
+  if (twDesc) twDesc.content = desc;
+}
+
 async function run(q, fresh, pushHistory = true) {
   closeSbox();
   if (busy) return;
   busy = true;
   lastQ = q;
+  updateSeoMetadata(q);
   setSearching(true);
   addRecent(q);
 
@@ -1407,6 +1435,7 @@ window.addEventListener("popstate", () => {
     lastQ = "";
     el.idhint.classList.remove("on");
     focusedIdx = -1;
+    updateSeoMetadata("");
     renderHomeHub();
   }
 });

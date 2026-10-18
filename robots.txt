@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://parthsadaria.github.io/Bonfire/sitemap.xml
