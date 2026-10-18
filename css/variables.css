@@ -1,0 +1,28 @@
+/* ==========================================================================
+   VIRGIL - THEMES & DESIGN TOKENS
+   ========================================================================== */
+
+:root {
+  /* Default theme (Midnight). Overridden dynamically per theme. */
+  --bg: #0a0a10;
+  --surface: #11121a;
+  --line: #1d1e2b;
+  --line2: #32344a;
+  --text: #e9eaf5;
+  --muted: #9799b3;
+  --faint: #6a6d8c;
+  --accent: #7c8cff;
+  --ink: #0a0b24;
+  --bad: #ff7a90;
+  --shadow: rgba(0, 0, 0, 0.55);
+  --vig: rgba(0, 0, 0, 0.5);
+  --scan: rgba(255, 255, 255, 0.02);
+
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --pix: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+html.tt, html.tt * {
+  transition: background-color .4s, color .4s, border-color .4s, fill .4s, stroke .4s, box-shadow .4s !important;
+}

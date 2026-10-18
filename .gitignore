@@ -1,0 +1,12 @@
+# Extra / local development & reference files
+extra/
+.extra/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & temp files
+*.log
+.temp/
