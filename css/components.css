@@ -336,6 +336,7 @@ mark.kw-match {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  font-family: inherit;
   font-size: 11.5px;
   font-weight: 500;
   color: var(--muted);
@@ -348,6 +349,7 @@ mark.kw-match {
   transition: all .2s ease;
   cursor: pointer;
   user-select: none;
+  line-height: inherit;
 }
 
 .leaving-tag .sub-ic {
@@ -399,6 +401,16 @@ mark.kw-match {
   margin-top: 2px;
   flex: none;
   cursor: pointer;
+  padding: 0;
+  display: block;
+}
+
+.rthumb .fav {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 0;
+  margin: 0;
 }
 
 .rthumb img {
@@ -888,30 +900,52 @@ mark.kw-match {
 .hub-tag {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 7px 15px;
+  padding: 5px 10px 5px 14px;
   font-size: 13.5px;
   color: var(--text);
-  cursor: pointer;
   transition: border-color .2s, background .2s, transform .15s;
 }
 
-.hub-tag:hover {
+.hub-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: color .2s;
+}
+
+.hub-label:hover {
+  color: var(--accent);
+}
+
+.hub-tag:hover,
+.hub-tag:focus-within {
   border-color: var(--accent);
   background: color-mix(in srgb, var(--surface) 80%, var(--accent));
   transform: translateY(-1px);
 }
 
 .hub-tag .del-tag {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
   color: var(--faint);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   transition: color .2s, background .2s;
 }

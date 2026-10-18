@@ -97,7 +97,24 @@ if (FX) {
 const ind = $("#ind");
 $("#h1").innerHTML = [..."Bonfire"].map(c => `<span class="ch" aria-hidden="true"><i>${c}</i></span>`).join("");
 
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const safeUrl = u => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; } catch { return null; } };
+
+function makeFallbackTile(letter, rc = "") {
+  const tile = document.createElement("div");
+  tile.className = ("fav " + rc).trim();
+  tile.setAttribute("aria-hidden", "true");
+  tile.textContent = (letter || "?").trim() || "?";
+  return tile;
+}
+
+document.addEventListener("error", e => {
+  const i = e.target;
+  if (i.tagName === "IMG" && i.hasAttribute("data-fallback")) {
+    i.parentElement.replaceChildren(makeFallbackTile(i.alt, i.dataset.rc || ""));
+  }
+}, true);
+
 const ico = n => `<i data-lucide="${n}"></i>`;
 const icons = () => {
   try {
@@ -125,6 +142,8 @@ function applyTheme(id, anim = true) {
   r.style.setProperty("--vig", t.light ? "transparent" : "rgba(0,0,0,.5)");
   r.style.setProperty("--scan", t.light ? "transparent" : "rgba(255,255,255,.02)");
   r.style.setProperty("--shadow", t.light ? "rgba(40,30,15,.16)" : "rgba(0,0,0,.55)");
+  r.style.setProperty("--rim-hl", t.light ? "rgba(0,0,0,.10)"       : "rgba(255,255,255,.14)");
+  r.style.setProperty("--rim-in", t.light ? "rgba(255,255,255,.90)" : "rgba(255,255,255,.12)");
   r.style.colorScheme = t.light ? "light" : "dark";
   const tcolor = $("#tcolor");
   if (tcolor) tcolor.content = t.v.bg;
@@ -159,7 +178,7 @@ function moveInd(anim = true) {
 const HERO_FLOW = ".hero .tabs,.hero .search,.hero .idhint,.hero .tools,#homeHub,main";
 function setSearching(on) {
   if (el.app.classList.contains("searching") === on) return;
-  if (!FX) {
+  if (!FX || RM) {
     el.app.classList.toggle("searching", on);
     moveInd(false);
     return;
@@ -260,6 +279,8 @@ function closeSbox() {
   if (el.sboxList) el.sboxList.innerHTML = "";
   sboxItems = [];
   sboxIdx = -1;
+  el.q.setAttribute("aria-expanded", "false");
+  el.q.removeAttribute("aria-activedescendant");
 }
 
 function highlightMatch(text, query) {
@@ -276,8 +297,9 @@ function renderSbox(items, query) {
     closeSbox();
     return;
   }
+  el.q.setAttribute("aria-expanded", "true");
   el.sboxList.innerHTML = sboxItems.map((item, idx) => `
-    <li class="sbox-item" role="option" data-idx="${idx}" data-val="${esc(item)}" data-cur="SELECT">
+    <li class="sbox-item" role="option" id="sb-${idx}" data-idx="${idx}" data-val="${esc(item)}" data-cur="SELECT">
       <span class="sbox-ic">${ico("search")}</span>
       <span class="sbox-text">${highlightMatch(item, query)}</span>
       <span class="sbox-arrow">${ico("arrow-up-right")}</span>
@@ -302,6 +324,12 @@ function updateSboxActive() {
       children[i].scrollIntoView({ block: "nearest" });
       el.q.value = sboxItems[i];
     }
+  }
+  const actItem = children[sboxIdx];
+  if (actItem) {
+    el.q.setAttribute("aria-activedescendant", actItem.id);
+  } else {
+    el.q.removeAttribute("aria-activedescendant");
   }
 }
 
@@ -409,11 +437,13 @@ function renderRecentTags() {
   }
   el.recentSec.hidden = false;
   el.recentTags.innerHTML = RECENTS.map(item => `
-    <span class="hub-tag" data-val="${esc(item)}" role="button" tabindex="0">
-      <i data-lucide="history"></i>
-      <span>${esc(item)}</span>
-      <span class="del-tag" data-del="${esc(item)}" title="Remove" aria-label="Remove recent search">×</span>
-    </span>
+    <div class="hub-tag" data-val="${esc(item)}">
+      <button type="button" class="hub-label" data-val="${esc(item)}">
+        <i data-lucide="history"></i>
+        <span>${esc(item)}</span>
+      </button>
+      <button type="button" class="del-tag" data-del="${esc(item)}" title="Remove" aria-label="Remove query">×</button>
+    </div>
   `).join("");
   icons();
 }
@@ -452,11 +482,11 @@ el.homeHub?.addEventListener("click", e => {
     sound.click();
     return;
   }
-  const tag = e.target.closest(".hub-tag");
-  if (tag && tag.dataset.val) {
-    el.q.value = tag.dataset.val;
+  const label = e.target.closest(".hub-label") || e.target.closest(".hub-tag");
+  if (label && label.dataset.val) {
+    el.q.value = label.dataset.val;
     scoreNext = true;
-    run(tag.dataset.val, true);
+    run(label.dataset.val, true);
     sound.click();
     return;
   }
@@ -554,7 +584,8 @@ function highlightQuery(text, query) {
 
 const row = (r, i, q) => {
   const [rc, rt] = RAR(i);
-  const realUrl = unwrapUrl(r.url);
+  const realUrl = safeUrl(unwrapUrl(r.url));
+  if (!realUrl) return "";
   let realDomain = r.domain || "";
   try {
     if (!realDomain || realDomain.includes("google.com")) {
@@ -562,7 +593,7 @@ const row = (r, i, q) => {
     }
   } catch (e) {}
   const visual = r.image 
-    ? `<div class="rthumb" data-url="${esc(realUrl)}" data-cur="VISIT" aria-hidden="true"><img src="${esc(r.image)}" alt="" onerror="this.parentElement.outerHTML='<div class=\\'fav ${rc}\\'>${esc((realDomain||'?').replace(/^www\\./,'')[0].toUpperCase())}</div>'"></div>`
+    ? `<button type="button" class="rthumb" data-url="${esc(realUrl)}" data-cur="VISIT" aria-label="View source"><img src="${esc(r.image)}" alt="${esc((realDomain||'?').replace(/^www\./,'')[0].toUpperCase())}" data-rc="${rc}" loading="lazy" data-fallback></button>`
     : `<div class="fav ${rc}" aria-hidden="true">${esc((realDomain||"?").replace(/^www\./,"")[0].toUpperCase())}</div>`;
   return `<li class="r" data-idx="${i}" data-url="${esc(realUrl)}" data-domain="${esc(realDomain)}">
   ${visual}
@@ -571,7 +602,7 @@ const row = (r, i, q) => {
     <div class="dom">
       <span class="dom-badge" title="Destination domain"><i data-lucide="globe"></i> <b>${esc(realDomain)}</b></span>
       <span class="rar ${rc}">${rt}</span>
-      <span class="leaving-tag" data-cur="SAFETY" title="External link: will verify safety before leaving"><i data-lucide="shield-alert"></i> Leaving Bonfire <i data-lucide="external-link" class="sub-ic"></i></span>
+      <button type="button" class="leaving-tag" data-cur="SAFETY" title="External link: will verify safety before leaving"><i data-lucide="shield-alert"></i> Leaving Bonfire <i data-lucide="external-link" class="sub-ic"></i></button>
     </div>
     <p>${highlightQuery(r.snippet, q)}</p>
   </div>
@@ -640,11 +671,13 @@ async function run(q, fresh, pushHistory = true) {
     const { items, total } = await CseService.fetchPage(q, start, cat, [...active]);
     el.state.innerHTML = "";
 
-    // Deduplicate results by normalized URL
+    // Deduplicate results by normalized URL and validate safeUrl
     const normUrl = u => unwrapUrl(u || "").replace(/^https?:\/\//i, "").replace(/\/$/, "").toLowerCase();
     const uniqueItems = [];
     for (const item of (items || [])) {
-      const norm = normUrl(item.url);
+      const safe = safeUrl(unwrapUrl(item.url));
+      if (!safe) continue;
+      const norm = normUrl(safe);
       if (!norm || seenUrls.has(norm)) continue;
       seenUrls.add(norm);
       uniqueItems.push(item);
@@ -654,7 +687,7 @@ async function run(q, fresh, pushHistory = true) {
       died(q);
     } else {
       const before = el.res.children.length;
-      el.res.insertAdjacentHTML("beforeend", uniqueItems.map((r, i) => row(r, before + i, q)).join(""));
+      el.res.insertAdjacentHTML("beforeend", uniqueItems.map((r, i) => row(r, before + i, q)).filter(Boolean).join(""));
       icons();
       if (FX) {
         gsap.from([...el.res.children].slice(before), {
@@ -1078,13 +1111,15 @@ let exitUrl = "";
 function openExitModal(url, domain) {
   if (!el.exitScrim || !url) return;
   const realUrl = unwrapUrl(url);
+  const safe = safeUrl(realUrl);
+  if (!safe) { toast("Blocked an unsafe link"); return; }
   exitOpen = true;
-  exitUrl = realUrl;
+  exitUrl = safe;
 
   let parsedDom = domain;
   if (!parsedDom || parsedDom.includes("google.com")) {
     try {
-      parsedDom = new URL(realUrl).hostname.replace(/^www\./i, "");
+      parsedDom = new URL(safe).hostname.replace(/^www\./i, "");
     } catch (e) {
       parsedDom = "external-site";
     }
@@ -1094,10 +1129,10 @@ function openExitModal(url, domain) {
     el.exitDomain.innerHTML = `<i data-lucide="globe"></i> <b>${esc(parsedDom)}</b>`;
   }
   if (el.exitUrlText) {
-    el.exitUrlText.textContent = realUrl;
+    el.exitUrlText.textContent = safe;
   }
   if (el.exitProceed) {
-    el.exitProceed.href = realUrl;
+    el.exitProceed.href = safe;
   }
 
   el.exitScrim.hidden = false;
