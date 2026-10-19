@@ -613,12 +613,12 @@ const row = (r, i, q) => {
 };
 
 function updateSeoMetadata(query = "") {
-  const defaultTitle = "Bonfire: Fast Meta-Search for Games, Software & Android";
-  const defaultDesc = "A clean, dark mode meta-search engine querying curated Google Programmable Search Engines across verified sources. Zero ads, zero tracking, tactical keyboard flow.";
+  const defaultTitle = "Bonfire - Search for Games, Software & Android Apps";
+  const defaultDesc = "Find games, software, and Android apps from trusted sites. All in one search. No ads, no tracking, just results.";
   
-  const title = query ? `${query} — Bonfire Search` : defaultTitle;
+  const title = query ? `${query} - Bonfire Search` : defaultTitle;
   const desc = query 
-    ? `Search results for "${query}" across curated ${cat} sources on Bonfire. Ad-free, tracking-free meta search.` 
+    ? `Results for "${query}" from trusted ${cat} sources on Bonfire. No ads, no tracking.` 
     : defaultDesc;
   
   document.title = title;
